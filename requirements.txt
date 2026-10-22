@@ -1,0 +1,7 @@
+# tested with Python 3.13
+numpy>=1.26        # tested 2.5.3
+scipy>=1.11        # tested 1.18.1
+matplotlib>=3.8    # tested 3.11.2
+mpmath>=1.3        # tested 1.3.0 (Pade coefficients in 60-digit arithmetic)
+openpyxl>=3.1      # tested 3.1.5 (CALCE spreadsheets)
+pillow>=10         # TIFF export of the journal figures

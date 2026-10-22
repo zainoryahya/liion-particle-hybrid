@@ -1,0 +1,7 @@
+Mohtat2020   RMSE  14.06 mV  max    29.9 mV   th_n: 0.400->0.018  th_p: 0.037->1.000
+Chen2020     RMSE  18.01 mV  max   154.5 mV   th_n: 0.726->0.221  th_p: 0.331->0.923
+Ecker2015    RMSE  48.72 mV  max   104.0 mV   th_n: 0.400->0.062  th_p: 0.247->1.000
+NCA_Kim2011  RMSE  11.62 mV  max    33.4 mV   th_n: 0.400->0.344  th_p: 0.349->0.993
+OKane2022    RMSE  17.77 mV  max   147.0 mV   th_n: 0.730->0.215  th_p: 0.332->0.920
+Ai2020       RMSE  79.11 mV  max   150.0 mV   th_n: 0.400->0.004  th_p: 0.457->1.000
+Marquis2019  RMSE  66.23 mV  max   172.5 mV   th_n: 0.400->0.001  th_p: 0.422->0.955

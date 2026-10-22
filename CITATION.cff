@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper and this software archive."
+title: "Particle diffusion under battery-management-system currents: error analysis and a hybrid correction (code and data)"
+type: software
+version: 1.0.0
+date-released: 2026-10-22
+license: MIT
+authors:
+  - family-names: Yahya
+    given-names: Zainor Ridzuan
+    affiliation: "Department of Mathematical Sciences, Faculty of Intelligent Computing, Universiti Malaysia Perlis"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: Mat Zin
+    given-names: Shazalina
+    affiliation: "Department of Mathematical Sciences, Faculty of Intelligent Computing, Universiti Malaysia Perlis"
+    email: shazalina@unimap.edu.my
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+keywords:
+  - lithium-ion battery
+  - single particle model
+  - finite volume
+  - error analysis
+  - parameter identification
+preferred-citation:
+  type: article
+  title: "Discretization Error in Particle Diffusion Biases Identified Lithium-Ion Battery Parameters: Analysis and a Hybrid Correction"
+  authors:
+    - family-names: Yahya
+      given-names: Zainor Ridzuan
+    - family-names: Mat Zin
+      given-names: Shazalina
+  journal: "Journal of The Electrochemical Society"
+  year: 2026
+  notes: "Submitted"
