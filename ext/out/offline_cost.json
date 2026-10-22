@@ -1,0 +1,7 @@
+{
+ "DRA n=6 realization (Hankel 1500, SVD)": 0.8678569039999502,
+ "Pade m=9 coefficients (60-digit)": 0.003566616999933103,
+ "hybrid per-mesh fit N=5, K=16": 0.008996122999974432,
+ "Chebyshev Nc=80 setup + modal form": 0.0009391689999347363,
+ "re-exponentiate 21 modes (per call)": 1.5228720000095564e-06
+}

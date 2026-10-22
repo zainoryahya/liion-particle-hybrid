@@ -1,0 +1,103 @@
+{
+ "0.00028": {
+  "FV, uniform": {
+   "config": "N=1000",
+   "states": 1000,
+   "gain": 0.000999683598849499,
+   "stiff": 4121377.253048852
+  },
+  "FV, optimally graded": {
+   "config": "N=50",
+   "states": 50,
+   "gain": 0.0007298479751745857,
+   "stiff": 63467804.90051628
+  },
+  "FV, two-cell extrapolation": {
+   "config": "N=200",
+   "states": 200,
+   "gain": 0.0006019320595285205,
+   "stiff": 164855.09012195145
+  },
+  "Chebyshev collocation": {
+   "config": "Nc=80",
+   "states": 39,
+   "gain": 0.00093808695242679,
+   "stiff": 582186.9621080861
+  },
+  "Pade approximant": {
+   "config": "m=9",
+   "states": 10,
+   "gain": 0.0006867324912082501,
+   "stiff": 17772.840681216097
+  },
+  "DRA (realized at this interval)": {
+   "config": "n=5",
+   "states": 6,
+   "gain": 0.0009330525625526886,
+   "stiff": 9610.132409953529
+  },
+  "hybrid (FV + correction)": {
+   "config": "N=5,K=16",
+   "states": 21,
+   "gain": 0.0007525401664921355,
+   "stiff": 3162277.660168379
+  },
+  "BT-SPA of hybrid": {
+   "config": "r=7",
+   "states": 8,
+   "gain": 0.0006617201595292463,
+   "stiff": 4992673.026136524
+  }
+ },
+ "2.8e-05": {
+  "FV, uniform": {
+   "config": "N=1000",
+   "states": 1000,
+   "gain": 0.0009996174420783266,
+   "stiff": 4121377.253048852
+  },
+  "FV, optimally graded": {
+   "config": "N=40",
+   "states": 40,
+   "gain": 0.0006288597765825733,
+   "stiff": 86405965.26087192
+  },
+  "FV, two-cell extrapolation": {
+   "config": "N=300",
+   "states": 300,
+   "gain": 0.0008406554487643877,
+   "stiff": 370923.95277439564
+  },
+  "Chebyshev collocation": {
+   "config": "Nc=80",
+   "states": 39,
+   "gain": 0.0009395297456087016,
+   "stiff": 582186.9621080861
+  },
+  "Pade approximant": {
+   "config": "m=10",
+   "states": 11,
+   "gain": 0.0022847358587865466,
+   "stiff": 25821.13733280374,
+   "not_reached": true
+  },
+  "DRA (realized at this interval)": {
+   "config": "n=6",
+   "states": 7,
+   "gain": 0.0006108621920531045,
+   "stiff": 86019.63764005028
+  },
+  "hybrid (FV + correction)": {
+   "config": "N=5,K=16",
+   "states": 21,
+   "gain": 0.00046685843604415793,
+   "stiff": 3162277.660168379
+  },
+  "BT-SPA of hybrid": {
+   "config": "r=7",
+   "states": 8,
+   "gain": 0.0008755594048427038,
+   "stiff": 4992673.026136524
+  }
+ }
+}
