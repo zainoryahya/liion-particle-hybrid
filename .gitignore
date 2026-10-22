@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.so
+*.o
+ext/bench
+# raw data (public, not redistributed)
+data/**/*.mat
+data/**/*.xlsx
+data/**/*.pdf
+data/**/*.txt
+!data/README.md
+calce/*.xlsx
+calce/dyn/*.xls
+calce/dyn/*.xlsx
+calce/raw.npz
+calce/dyn/dyn.npz
+nasa/B0005.mat
+# generated figures
+figures/**
+!figures/.gitkeep
