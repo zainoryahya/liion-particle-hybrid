@@ -1,12 +1,27 @@
 {
   "title": "Particle diffusion under battery-management-system currents: error analysis and a hybrid correction (code and data)",
   "upload_type": "software",
-  "description": "Code and derived results for the paper 'Discretization Error in Particle Diffusion Biases Identified Lithium-Ion Battery Parameters: Analysis and a Hybrid Correction' (Z. R. Yahya and S. Mat Zin, submitted to the Journal of The Electrochemical Society). Regenerates all figures and tables. Raw battery data are public and are not redistributed; see data/README.md.",
+  "description": "Code and derived results for the paper 'Discretization Error in Particle Diffusion Biases Identified Lithium-Ion Battery Parameters: Analysis and a Hybrid Correction' (Z. R. Yahya and S. Mat Zin, submitted to the Journal of The Electrochemical Society). Regenerates the figures and tables from the stored results; Fig. 6a and the parameter fits need the public raw battery data, which are not redistributed (see data/README.md).",
   "creators": [
-    {"name": "Yahya, Zainor Ridzuan", "affiliation": "Universiti Malaysia Perlis"},
-    {"name": "Mat Zin, Shazalina", "affiliation": "Universiti Malaysia Perlis"}
+    {
+      "name": "Yahya, Zainor Ridzuan",
+      "affiliation": "Universiti Malaysia Perlis",
+      "orcid": "0000-0001-8468-3547"
+    },
+    {
+      "name": "Mat Zin, Shazalina",
+      "affiliation": "Universiti Malaysia Perlis",
+      "orcid": "0000-0002-0544-989X"
+    }
   ],
   "license": "MIT",
-  "keywords": ["lithium-ion battery", "single particle model", "finite volume", "error analysis", "parameter identification"],
-  "access_right": "open"
+  "keywords": [
+    "lithium-ion battery",
+    "single particle model",
+    "finite volume",
+    "error analysis",
+    "parameter identification"
+  ],
+  "access_right": "open",
+  "version": "1.0.1"
 }
