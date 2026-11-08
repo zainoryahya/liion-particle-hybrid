@@ -1,4 +1,4 @@
-"""Quick check (about 1 minute, no battery data needed): recomputes key numbers of the paper from scratch and compares
+"""Quick check (about 10 seconds, no battery data needed): recomputes key numbers of the paper from scratch and compares
 them with the values printed in the paper.  Run:  python verify_quick.py"""
 import os, sys, io, contextlib, json
 import numpy as np

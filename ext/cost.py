@@ -2,9 +2,11 @@
 Reviewer request: cost vs accuracy. For each surface-concentration approximation, find the smallest model whose sharp
 l_inf gain (Theorem 1) is <= TARGET at dtau = 2.8e-4 (1 s, fitted graphite) and 2.8e-5 (fast sampling / large particles),
 and report states, stiffness (max |eigenvalue|) and per-step cost of an exact zero-order-hold update.
+Also times the offline (set-up) steps quoted in the text and writes them to ext/out/offline_cost.json.
+Timings are machine-dependent; the stored JSON files hold the values reported in the paper.
 """
 import os; ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repository root
-import numpy as np, json, sys, io, contextlib, mpmath as mp
+import numpy as np, json, sys, io, contextlib, time, mpmath as mp
 from scipy.linalg import expm, eigh
 from scipy.optimize import minimize_scalar
 sys.path.insert(0, ROOT + '/ext'); sys.path.insert(0, ROOT + '/calce'); sys.path.insert(0, ROOT + '/battery')
@@ -13,7 +15,7 @@ with contextlib.redirect_stdout(io.StringIO()):
     import rom_hybrid as RH
 import calce_model as CM
 import compare_tf3 as T3
-_g = {}; _src = open(ROOT + '/ext/graded.py').read(); exec(_src[:_src.index('OUT = {')], _g)
+_g = {'__file__': ROOT + '/ext/graded.py'}; _src = open(ROOT + '/ext/graded.py').read(); exec(_src[:_src.index('OUT = {')], _g)
 fv_graded, faces_of, step_resp = _g['fv_graded'], _g['faces_of'], _g['step_resp']
 
 TARGET = 1e-3
@@ -113,3 +115,44 @@ for dtau in [2.8e-4, 2.8e-5]:
         print(f'   {k:32s} {v["config"]:10s} states {v["states"]:5d} gain {v["gain"]:.2e} max|lambda| {v["stiff"]:.2e}'
               + ('  (target not reached)' if v.get('not_reached') else ''), flush=True)
 json.dump(OUT, open(ROOT + '/ext/out/cost.json', 'w'), indent=1)
+
+
+# ---- offline (set-up) cost of each approximation, quoted in the text next to Table 2 ----
+def best_time(fn, repeat=5, number=1):
+    best = np.inf
+    for _ in range(repeat):
+        t0 = time.perf_counter()
+        for _ in range(number):
+            fn()
+        best = min(best, (time.perf_counter() - t0) / number)
+    return float(best)
+
+
+def pade_coeffs(m):
+    mp.mp.dps = 60
+    return mp.pade(taylor_Gr(2 * m + 2), m - 1, m)
+
+
+def cheb_modal(Nc):
+    A, b, C, d, ns = T3.cheb_sys(Nc)
+    return np.linalg.eig(A)
+
+
+def hyb_fit():
+    H.MU = np.logspace(-1, 6.5, 16)
+    return H.fit_correction(5, tau_min=2.8e-4 / 20)
+
+
+mu21 = np.logspace(-1, 6.5, 21)
+OFF = {
+    'DRA n=6 realization (Hankel 1500, SVD)': best_time(lambda: T3.dra_cont(6, 2.8e-4, 1500), repeat=3),
+    'Pade m=9 coefficients (60-digit)': best_time(lambda: pade_coeffs(9)),
+    'hybrid per-mesh fit N=5, K=16': best_time(hyb_fit),
+    'Chebyshev Nc=80 setup + modal form': best_time(lambda: cheb_modal(80)),
+    're-exponentiate 21 modes (per call)': best_time(lambda: np.exp(-mu21 * 2.8e-4), repeat=7, number=20000),
+}
+H.MU = np.logspace(-1, 6.5, 16)
+print('offline cost (s):')
+for k, v in OFF.items():
+    print(f'   {k:42s} {v:.3e}')
+json.dump(OFF, open(ROOT + '/ext/out/offline_cost.json', 'w'), indent=1)

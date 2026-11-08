@@ -1,4 +1,5 @@
-"""Extended numerical evidence for Prop 1(c): sup|r_N| and TV(r_N)/h^2 up to N = 320."""
+"""Extended numerical evidence for Prop 1(c): sup|r_N| and TV(r_N)/h^2 for N = 2 ... 320 on tau in [1e-11, 20].
+For N <= 80 the horizon is also cut at tau/h^2 <= 1e5 (tau <= 15.6 for N = 80), where the half-line function g is tabulated."""
 import os; ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repository root
 import numpy as np, sys, json
 sys.path.insert(0, ROOT + '/calce')
@@ -14,7 +15,7 @@ def g_half(sig):
         out[i:i + 100] = -2 * np.sqrt(s / np.pi) + 0.5 + ph @ v1sq
     return out
 rows = []
-for N in [10, 20, 40, 80, 160, 320]:
+for N in [2, 3, 4, 5, 6, 8, 10, 20, 40, 80, 160, 320]:
     h = 1 / N
     tau = np.r_[0.0, np.logspace(-11, 1.3, 2500)]
     tau = tau[tau / h ** 2 <= 1e5] if N <= 80 else tau

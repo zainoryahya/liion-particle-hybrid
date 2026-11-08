@@ -2,19 +2,21 @@ cff-version: 1.2.0
 message: "If you use this code, please cite the paper and this software archive."
 title: "Particle diffusion under battery-management-system currents: error analysis and a hybrid correction (code and data)"
 type: software
-version: 1.0.0
-date-released: 2026-10-22
+version: 1.0.1
+date-released: 2026-11-08
 license: MIT
+doi: 10.5281/zenodo.23556199
+repository-code: "https://github.com/zainoryahya/liion-particle-hybrid"
 authors:
   - family-names: Yahya
     given-names: Zainor Ridzuan
     affiliation: "Department of Mathematical Sciences, Faculty of Intelligent Computing, Universiti Malaysia Perlis"
-    # orcid: "https://orcid.org/0000-0000-0000-0000"
+    email: zainoryahya@unimap.edu.my
+    orcid: "https://orcid.org/0000-0001-8468-3547"
   - family-names: Mat Zin
     given-names: Shazalina
     affiliation: "Department of Mathematical Sciences, Faculty of Intelligent Computing, Universiti Malaysia Perlis"
-    email: shazalina@unimap.edu.my
-    # orcid: "https://orcid.org/0000-0000-0000-0000"
+    orcid: "https://orcid.org/0000-0002-0544-989X"
 keywords:
   - lithium-ion battery
   - single particle model

@@ -42,6 +42,18 @@ for MUK in [6, 8, 16]:
         if MUK == 16:
             OUT.setdefault('trace', {})[lab] = (Vm - Vref).tolist()
     OUT[f'K{MUK}'] = row
+# plain FV on finer meshes (Fig. 2d and the 23, 12, 6.2 mV quoted in the text)
+more = {}
+for N in [40, 80, 160]:
+    th = {}
+    for el in ['n', 'p']:
+        R = p['R_' + el]; D = p['D_' + el]; g = p['g' + el]
+        q = g * I * R ** 2 / D; dtau = D * dt / R ** 2
+        th[el] = th0[el] + H.simulate(N, q, dtau)
+    e = np.abs(voltage(p, th['n'], th['p'], I, np.full(nst, 298.15)) - Vref) * 1e3
+    more[f'plain{N}'] = dict(max_mV=float(e.max()), rms_mV=float(np.sqrt(np.mean(e ** 2))), states=2 * N)
+    print(f'plain FV N={N:3d}  total states {2 * N:3d}: voltage error max {e.max():7.3f} mV  RMS {np.sqrt(np.mean(e**2)):7.4f} mV', flush=True)
+OUT['plain_more'] = more
 OUT['I'] = I.tolist(); OUT['Vref'] = Vref.tolist()
 json.dump(OUT, open(ROOT + '/ext/out/hybrid_voltage.json', 'w'))
 print('done')

@@ -18,6 +18,8 @@ ax[0].annotate('jump h/2 at every\ncurrent step', (1e-6, 0.05), xytext=(2e-7, 2e
 ax[0].set(xlabel=r'dimensionless time after a current step', ylabel='surface-concentration error', ylim=(1e-7, 0.2),
           title='Hidden first-order error and its removal')
 ax[0].legend(fontsize=7.5, loc='center right', bbox_to_anchor=(1.0, 0.5))
+# x axis: Pi of the negative electrode (Pi_n), the electrode whose diffusion-time ratio tau_n is plotted.
+# The CALCE point (2.11) is also Pi_n. Fig. 6c of the submitted manuscript plots the same tau_n ratios against max_e Pi_e.
 SW = json.load(open(ROOT + '/samsung/sweep_ss.json')); Pi = np.array([r['Pi'] for r in SW])
 for lab, col, m, name in [('fv10', C[1], 'o', 'finite volume, 10 cells'), ('fv20', C[3], 's', 'finite volume, 20 cells'), ('hybrid10', C[0], 'D', 'hybrid, 10 cells')]:
     ok = np.array([r[lab]['rmse'] < 50 for r in SW]); y = np.array([r[lab]['tau_n_ratio'] for r in SW])
