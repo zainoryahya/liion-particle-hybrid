@@ -8,6 +8,7 @@ with contextlib.redirect_stdout(io.StringIO()):
 import calce_model as CM
 from scipy.linalg import expm
 import compare_tf as CT   # uses taylor_Gr, S_zeng (re-runs that script; cheap)
+import horizon as HZ
 
 def pade_S(m, lags, dps=60):
     mp.mp.dps = dps
@@ -22,15 +23,12 @@ def pade_S(m, lags, dps=60):
 
 def rom_S(r, lags):
     A, B, C, D = RH.make_rom('HYB', r)
-    n = len(B); Ai = np.linalg.solve(A, B)
-    out = []
-    for t in lags:
-        out.append(C @ (expm(A * t) @ Ai - Ai) + D)
-    return -3 * lags + np.array(out)
+    w, U = np.linalg.eig(A); Bm = np.linalg.solve(U, B); Cm = C @ U
+    return -3 * lags + D + np.real((Cm * Bm / w)[None, :] * np.expm1(np.outer(lags, w))).sum(1)
 
 OUT = {}
 for dtau in [2.8e-5, 2.8e-4, 2.8e-3, 2.8e-2]:
-    lags = np.arange(1800) * dtau
+    lags = HZ.lags_for(dtau)
     Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
     g = lambda S: abs(Sx[0]-S[0]) + np.abs(np.diff(Sx - S)).sum()
     row = {}
@@ -51,7 +49,7 @@ for dtau in [2.8e-5, 2.8e-4, 2.8e-3, 2.8e-2]:
     for k, v in row.items(): print(f'    {k:36s} {v:.2e}' if v is not None else f'    {k:36s} unstable')
 json.dump(OUT, open(ROOT + '/ext/out/compare_tf2.json', 'w'))
 # precision sensitivity: Pade m=10 in double precision (dps=16)
-lags = np.arange(1800) * 2.8e-4
+lags = HZ.lags_for(2.8e-4)
 for dps in [16, 20, 25, 60]:
     try:
         S = pade_S(10, lags, dps)

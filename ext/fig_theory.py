@@ -39,10 +39,10 @@ ax[1].legend(fontsize=7.3, loc='lower left')
 
 # (c) sharp worst-case gain and observed errors
 T = D['thm']; N = np.array([r['N'] for r in T])
-for lab, col, name in [('FV', C[1], 'finite volume'), ('hybrid_universal', C[2], 'hybrid, universal fit (20 states, any N)'),
+for lab, col, name in [('FV', C[1], 'finite volume'), ('hybrid_universal', C[2], 'hybrid, universal fit (40 states, any N)'),
                        ('hybrid_fitN', C[0], 'hybrid, fitted per N (16 states)')]:
-    ax[2].loglog(N, [r[lab]['gain'] for r in T], '-', color=col, lw=1.4,
-                 label=f"{name} (order {D['order_' + lab + '_gain']:.2f})")
+    ax[2].loglog(N, [r[lab]['gain_inf'] for r in T], '-', color=col, lw=1.4,
+                 label=f"{name} (order {D['order_' + lab + '_gain_inf']:.2f})")
     ax[2].loglog(N, [r[lab]['max_err'] / np.abs(1.471) for r in T], 'o', color=col, ms=5, mfc='white')
 ax[2].plot([], [], '-', color=INK2, lw=1.4, label='line: sharp worst-case gain (Thm. 2)')
 ax[2].plot([], [], 'o', color=INK2, mfc='white', label=r'circle: observed error$/\|q\|_\infty$, random profile')

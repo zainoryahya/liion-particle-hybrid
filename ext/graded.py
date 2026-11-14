@@ -45,8 +45,9 @@ def gain(Sx, Sm):
 
 
 OUT = {'graded': {}, 'be': {}}
+import horizon as HZ
 for dtau in [2.8e-5, 2.8e-4, 2.8e-3]:
-    lags = np.arange(1800) * dtau
+    lags = HZ.lags_for(dtau)
     Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
     row = []
     for N in [5, 10, 20, 40]:
@@ -59,7 +60,7 @@ for dtau in [2.8e-5, 2.8e-4, 2.8e-3]:
     OUT['graded'][str(dtau)] = row
 
 # (ii) implicit Euler with dt = sampling interval
-dtau = 2.8e-4; n = 1800; lags = np.arange(n) * dtau
+dtau = 2.8e-4; n = int(np.ceil(HZ.T_H / dtau)) + 1; lags = np.arange(n) * dtau   # consecutive steps (recursion)
 Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
 for N in [10, 20]:
     K, b, V, D = fv_graded(faces_of(N, 0.0))

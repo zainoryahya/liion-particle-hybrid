@@ -7,6 +7,8 @@ Prop 1 (a) E_N(0+) = h/2 ;  (b) E_N(inf) = h^2/3 - h^4/30 (closed form) ;
 Theorem 2 (error representation & sharp bound): for piecewise-constant q, e_k = sum_j dq_j delta((k-j)dtau) and
        sup_{|q|<=1} |e_k| = |delta(0)| + sum_{m=1}^k |delta(m dtau) - delta((m-1) dtau)|   (an equality, not merely a bound).
 Theorem 3 (universal correction): Ehat_N(tau) = h ghat(tau/h^2) with ghat(0) = 1/2 -> uniform O(h^2) error, K states independent of N.
+Gains reported in Table 1 ('gain_inf') are taken over five diffusion times (horizon.py); 'gain' is the gain over the
+1800-step random profile used for the error-bound check.
 """
 import os; ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repository root
 import numpy as np, json, sys, math
@@ -14,6 +16,7 @@ from scipy.linalg import eigh
 from scipy.special import gamma
 sys.path.insert(0, ROOT + '/ext'); sys.path.insert(0, ROOT + '/battery')
 import io, contextlib
+import horizon as HZ
 with contextlib.redirect_stdout(io.StringIO()):
     import hybrid as H
 from spm import SPM
@@ -100,8 +103,10 @@ OUT['order_sup_E_minus_hg'] = o
 print(f'order |E - h g|: {o:.2f}  (expect 2)')
 
 # ---------- universal correction: fit ghat once (half-line), constraint ghat(0) = 1/2
-NU = np.logspace(-6, 3, 20)
-sf = np.logspace(-5, 6, 700)
+# rates up to 1e8 so that the sqrt(sigma) start of g is resolved down to sigma ~ 1e-9 (Delta tau / h^2 that small
+# occurs for fast sampling, slow diffusion or large particles); about three rates per decade, K = 40
+NU = np.logspace(-6, 8, 40)
+sf = np.logspace(-9, 6, 1200)
 gf = g_half(sf[sf <= 1e5]); sf_ = sf[sf <= 1e5]
 # asymptotic tail for sigma > 1e5
 sf2 = sf[sf > 1e5]; gf2 = 1 / (8 * np.sqrt(np.pi * sf2))
@@ -144,12 +149,15 @@ for N in Ns:
     Ehat_N = cf['Einf'] + np.exp(-np.outer(lags, H.MU)) @ cf['w']
     Ehat_U = h * ghat(lags / h ** 2)
     rec = dict(N=N)
+    LH = HZ.lags_for(dtau); SxH = S_exact(LH); SxH[0] = 0.0; EH = SxH - S_fv(N, LH)
+    EhatH = {'FV': 0 * EH, 'hybrid_fitN': cf['Einf'] + np.exp(-np.outer(LH, H.MU)) @ cf['w'], 'hybrid_universal': h * ghat(LH / h ** 2)}
     for lab, Ehat in [('FV', 0 * E), ('hybrid_fitN', Ehat_N), ('hybrid_universal', Ehat_U)]:
         d = E - Ehat
         y = duhamel(Sh + Ehat, q)
         err = np.abs(y - ref).max()
         G = gain(d)
-        rec[lab] = dict(max_err=float(err), gain=float(G), bound=float(G * qmax), ok=bool(err <= G * qmax * (1 + 1e-9)))
+        rec[lab] = dict(max_err=float(err), gain=float(G), bound=float(G * qmax), ok=bool(err <= G * qmax * (1 + 1e-9)),
+                        gain_inf=float(gain(EH - EhatH[lab])))
     t2.append(rec)
     print(f"N={N:3d}: FV error {rec['FV']['max_err']:.2e} <= gain*|q| {rec['FV']['bound']:.2e} [{rec['FV']['ok']}] | "
           f"hybrid(fit-N) {rec['hybrid_fitN']['max_err']:.2e} <= {rec['hybrid_fitN']['bound']:.2e} [{rec['hybrid_fitN']['ok']}] | "
@@ -188,4 +196,24 @@ for N in Ns:
                     sigma1=float(s1), eta=float(eta)))
     print(f"N={N:3d}: TV(r_N)/h^2 = {add[-1]['TV_rN_over_h2']:.4f}   sigma_1 = dtau/h^2 = {s1:.3g}   eta_K(sigma_1) = {eta:.2e}")
 OUT['thm3'] = add
+json.dump(OUT, open(ROOT + '/ext/out/hybrid_theory.json', 'w'))
+
+for lab in ['FV', 'hybrid_fitN', 'hybrid_universal']:
+    v = [r[lab]['gain_inf'] for r in t2]
+    OUT[f'order_{lab}_gain_inf'] = -np.polyfit(np.log(Ns), np.log(v), 1)[0]
+    print(f"gain over 5 diffusion times, {lab:17s}: " + ' '.join(f'{x:.2e}' for x in v) + f"  order {OUT[f'order_{lab}_gain_inf']:.2f}")
+
+# ---------- universal correction at small sampling intervals (local orders between successive N)
+NS2 = [5, 10, 20, 40, 80, 160]
+small = {}
+for dt in [2.8e-4, 2.8e-6, 2.8e-7]:
+    LH = HZ.lags_for(dt); SxH = S_exact(LH); SxH[0] = 0.0
+    G = []
+    for N in NS2:
+        h = 1 / N
+        G.append(gain(SxH - S_fv(N, LH) - h * ghat(LH / h ** 2)))
+    orders = [float(np.log(G[i] / G[i + 1]) / np.log(2)) for i in range(len(G) - 1)]
+    small[str(dt)] = dict(N=NS2, gain=[float(x) for x in G], local_order=orders)
+    print(f'universal, dtau={dt:.1e}: gains ' + ' '.join(f'{x:.2e}' for x in G) + '  local orders ' + ' '.join(f'{o:.2f}' for o in orders), flush=True)
+OUT['universal_small_dtau'] = small
 json.dump(OUT, open(ROOT + '/ext/out/hybrid_theory.json', 'w'))

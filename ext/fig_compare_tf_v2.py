@@ -37,7 +37,7 @@ for lab, col, m in [('Chebyshev Nc=20 (9 states)', '#8c5a3c', 'h-'), ('DRA n=10 
                      ('DRA n=10 realized at 2.8e-5 (long horizon)', '#139a9a', 'x--')]:
     ax[1].loglog(x, [T3['vs_dtau'][d][lab] for d in dts], m, color=col, ms=5, mew=1.3, lw=1.2,
                  label=lab.replace('realized at 2.8e-4, used at this interval', 'realized at $\\Delta\\tau$=2.8e-4 (11 states)').replace('realized at 2.8e-5 (long horizon)', 'realized at $\\Delta\\tau$=2.8e-5 (11 states)'))
-ax[1].axvspan(1e-5, 1.2e-4, color=GRID, alpha=0.6, lw=0)
+ax[1].axvspan(6e-5, 8e-5, color=GRID, alpha=0.9, lw=0)
 ax[1].text(1.2e-5, 3e-9, 'fitted CALCE cell,\n1 s sampling', fontsize=7, color=INK2)
 ax[1].set(xlabel=r'sampling interval $\Delta\tau = D\,\Delta t/R^2$', ylabel=r'sharp $\ell_\infty$ error gain', title='(b) Dependence on sampling interval', xlim=(1e-5, 5e-2))
 ax[1].legend(fontsize=7, loc='upper center', bbox_to_anchor=(0.5, -0.17), ncol=2)

@@ -15,6 +15,7 @@ sys.path.insert(0, ROOT + '/ext'); sys.path.insert(0, ROOT + '/calce')
 with contextlib.redirect_stdout(io.StringIO()):
     import hybrid as H
 import calce_model as CM
+import horizon as HZ
 
 
 def cheb(N):
@@ -52,14 +53,12 @@ def cheb_sys(Nc):
 
 
 def step_lin(A, b, C, d, lags):
-    n = len(b); Aug = np.zeros((n + 1, n + 1)); Aug[:n, :n] = A; Aug[:n, n] = b
-    dt = lags[1] - lags[0]
-    E = expm(Aug * dt); Ad, Bd = E[:n, :n], E[:n, n]
-    x = np.zeros(n); out = np.empty(len(lags))
-    for k in range(len(lags)):
-        out[k] = C @ x + d
-        x = Ad @ x + Bd
-    return out
+    # exact zero-order-hold update of x' = A x + b q: at the sample times it reproduces the continuous step response
+    w, U = np.linalg.eig(A); bm = np.linalg.solve(U, b); cm = C @ U
+    z = np.abs(w) < 1e-9                                   # mass (integrator) mode
+    wz = np.where(z, 1.0, w)
+    phi = np.where(z[None, :], lags[:, None], np.expm1(np.outer(lags, wz)) / wz)   # int_0^t e^{w s} ds
+    return d + np.real((cm * bm)[None, :] * phi).sum(1)
 
 
 def dra(n, dtau, nh=1500):
@@ -78,13 +77,12 @@ def dra(n, dtau, nh=1500):
     return Ad, Bd, Cd, s
 
 
-def step_dra(Ad, Bd, Cd, lags):
+def step_dra(Ad, Bd, Cd, lags, dtau):
     # output at tau_k uses q_k (same convention as the other surrogates): y_k = -3 tau_k + sum_{j<k} Cd Ad^{k-1-j} Bd
-    x = np.zeros(len(Bd)); out = np.empty(len(lags))
-    for k in range(len(lags)):
-        out[k] = -3 * lags[k] + Cd @ x
-        x = Ad @ x + Bd
-    return out
+    k = np.round(lags / dtau)
+    lam, V = np.linalg.eig(Ad); bm = np.linalg.solve(V, Bd); cm = Cd @ V
+    geo = (1 - lam[None, :] ** k[:, None]) / (1 - lam[None, :])          # sum_{j<k} lam^j
+    return -3 * lags + np.real((cm * bm)[None, :] * geo).sum(1)
 
 
 def dra_cont(n, dt0, nh):
@@ -102,8 +100,8 @@ def step_cont(Ac, Bc, Cd, lags):
     return -3 * lags + np.real((Cm * Bm / w)[None, :] * np.expm1(np.outer(lags, w))).sum(1)
 
 
-def gain_at(S_model, dtau, nst=1800):
-    lags = np.arange(nst) * dtau
+def gain_at(S_model, dtau):
+    lags = HZ.lags_for(dtau)
     Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
     d = Sx - S_model
     return float(abs(d[0]) + np.abs(np.diff(d)).sum())
@@ -111,7 +109,7 @@ def gain_at(S_model, dtau, nst=1800):
 
 if __name__ == '__main__':
     OUT = {'cheb': [], 'dra': [], 'vs_dtau': {}}
-    dtau = 2.8e-4; lags = np.arange(1800) * dtau
+    dtau = 2.8e-4; lags = HZ.lags_for(dtau)
     for Nc in [6, 8, 10, 12, 16, 20, 24, 32, 40]:
         A, b, C, d, ns = cheb_sys(Nc)
         ev = np.linalg.eigvals(A)
@@ -121,16 +119,16 @@ if __name__ == '__main__':
         print(f'Chebyshev Nc={Nc:3d}: {ns:3d} states  gain {g:.2e}  surface jump S(0+)={d:+.3e}  |lambda|max {np.max(np.abs(ev)):.1e}')
     for n in [2, 3, 4, 6, 8, 10, 12]:
         Ad, Bd, Cd, s = dra(n, dtau)
-        S = step_dra(Ad, Bd, Cd, lags)
+        S = step_dra(Ad, Bd, Cd, lags, dtau)
         g = gain_at(S, dtau)
         OUT['dra'].append(dict(n=n, states=n + 1, gain=g, rho=float(np.max(np.abs(np.linalg.eigvals(Ad))))))
         print(f'DRA n={n:2d} (+1 integrator): gain {g:.2e}  spectral radius {np.max(np.abs(np.linalg.eigvals(Ad))):.6f}')
     for dt in [2.8e-5, 2.8e-4, 2.8e-3, 2.8e-2]:
-        lg = np.arange(1800) * dt; row = {}
+        lg = HZ.lags_for(dt); row = {}
         A, b, C, d, ns = cheb_sys(20)
         row[f'Chebyshev Nc=20 ({ns} states)'] = gain_at(step_lin(A, b, C, d, lg), dt)
         Ad, Bd, Cd, s = dra(10, dt)
-        row['DRA n=10 (11 states)'] = gain_at(step_dra(Ad, Bd, Cd, lg), dt)
+        row['DRA n=10 (11 states)'] = gain_at(step_dra(Ad, Bd, Cd, lg, dt), dt)
         for (n0, dt0, nh0, lab) in [(10, 2.8e-4, 1500, 'DRA n=10 realized at 2.8e-4, used at this interval'),
                                     (10, 2.8e-5, 3000, 'DRA n=10 realized at 2.8e-5 (long horizon)')]:
             row[lab] = gain_at(step_cont(*dra_cont(n0, dt0, nh0), lg), dt)

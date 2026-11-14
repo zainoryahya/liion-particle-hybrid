@@ -7,6 +7,7 @@ sys.path.insert(0, ROOT + '/ext'); sys.path.insert(0, ROOT + '/calce')
 with contextlib.redirect_stdout(io.StringIO()):
     import graded as G
 import calce_model as CM
+sys.path.insert(0, ROOT + '/ext'); import horizon as HZ
 
 def step_resp_C(K, b, V, C, D, lags):
     Mv = np.diag(V); S = Mv @ K; S = 0.5 * (S + S.T)
@@ -16,7 +17,7 @@ def step_resp_C(K, b, V, C, D, lags):
 
 OUT = {}
 for dtau in [2.8e-5, 2.8e-4, 2.8e-3]:
-    lags = np.arange(1800) * dtau; Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
+    lags = HZ.lags_for(dtau); Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
     for N in [5, 10, 20, 40]:
         K, b, V, D = G.fv_graded(G.faces_of(N, 0.0)); h = 1.0 / N
         e = np.zeros(N); e[-1] = 1

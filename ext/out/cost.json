@@ -3,49 +3,49 @@
   "FV, uniform": {
    "config": "N=1000",
    "states": 1000,
-   "gain": 0.000999683598849499,
-   "stiff": 4121377.253048852
+   "gain": 0.0009996884489369418,
+   "stiff": 4121377.25304885
   },
   "FV, optimally graded": {
    "config": "N=50",
    "states": 50,
-   "gain": 0.0007298479751745857,
-   "stiff": 63467804.90051628
+   "gain": 0.0007301745530790132,
+   "stiff": 63483581.45688477
   },
   "FV, two-cell extrapolation": {
    "config": "N=200",
    "states": 200,
-   "gain": 0.0006019320595285205,
+   "gain": 0.0006019343264549448,
    "stiff": 164855.09012195145
   },
   "Chebyshev collocation": {
    "config": "Nc=80",
    "states": 39,
-   "gain": 0.00093808695242679,
+   "gain": 0.000938087105381772,
    "stiff": 582186.9621080861
   },
   "Pade approximant": {
    "config": "m=9",
    "states": 10,
-   "gain": 0.0006867324912082501,
+   "gain": 0.0006867324912086942,
    "stiff": 17772.840681216097
   },
   "DRA (realized at this interval)": {
    "config": "n=5",
    "states": 6,
-   "gain": 0.0009330525625526886,
-   "stiff": 9610.132409953529
+   "gain": 0.0009341840594706136,
+   "stiff": 9610.132409953543
   },
   "hybrid (FV + correction)": {
    "config": "N=5,K=16",
    "states": 21,
-   "gain": 0.0007525401664921355,
+   "gain": 0.0008569984010114579,
    "stiff": 3162277.660168379
   },
   "BT-SPA of hybrid": {
    "config": "r=7",
    "states": 8,
-   "gain": 0.0006617201595292463,
+   "gain": 0.0006618361194127196,
    "stiff": 4992673.026136524
   }
  },
@@ -53,50 +53,50 @@
   "FV, uniform": {
    "config": "N=1000",
    "states": 1000,
-   "gain": 0.0009996174420783266,
-   "stiff": 4121377.253048852
+   "gain": 0.0009996884485043989,
+   "stiff": 4121377.25304885
   },
   "FV, optimally graded": {
-   "config": "N=40",
-   "states": 40,
-   "gain": 0.0006288597765825733,
-   "stiff": 86405965.26087192
+   "config": "N=50",
+   "states": 50,
+   "gain": 0.0007571469112195462,
+   "stiff": 57595965.01433339
   },
   "FV, two-cell extrapolation": {
    "config": "N=300",
    "states": 300,
-   "gain": 0.0008406554487643877,
+   "gain": 0.0008447210440570337,
    "stiff": 370923.95277439564
   },
   "Chebyshev collocation": {
    "config": "Nc=80",
    "states": 39,
-   "gain": 0.0009395297456087016,
+   "gain": 0.0009395299007306047,
    "stiff": 582186.9621080861
   },
   "Pade approximant": {
    "config": "m=10",
    "states": 11,
-   "gain": 0.0022847358587865466,
+   "gain": 0.0022847358589242143,
    "stiff": 25821.13733280374,
    "not_reached": true
   },
   "DRA (realized at this interval)": {
-   "config": "n=6",
-   "states": 7,
-   "gain": 0.0006108621920531045,
-   "stiff": 86019.63764005028
+   "config": "n=8",
+   "states": 9,
+   "gain": 0.0008879009386637722,
+   "stiff": 115965.53768332959
   },
   "hybrid (FV + correction)": {
    "config": "N=5,K=16",
    "states": 21,
-   "gain": 0.00046685843604415793,
+   "gain": 0.0008867202804990187,
    "stiff": 3162277.660168379
   },
   "BT-SPA of hybrid": {
    "config": "r=7",
    "states": 8,
-   "gain": 0.0008755594048427038,
+   "gain": 0.0009500558124538503,
    "stiff": 4992673.026136524
   }
  }

@@ -15,6 +15,7 @@ with contextlib.redirect_stdout(io.StringIO()):
     import rom_hybrid as RH
 import calce_model as CM
 import compare_tf3 as T3
+import horizon as HZ
 _g = {'__file__': ROOT + '/ext/graded.py'}; _src = open(ROOT + '/ext/graded.py').read(); exec(_src[:_src.index('OUT = {')], _g)
 fv_graded, faces_of, step_resp = _g['fv_graded'], _g['faces_of'], _g['step_resp']
 
@@ -74,7 +75,7 @@ def first(cands, Sx, lags):
 
 OUT = {}
 for dtau in [2.8e-4, 2.8e-5]:
-    lags = np.arange(1800) * dtau
+    lags = HZ.lags_for(dtau)
     Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
     row = {}
 

@@ -2,6 +2,8 @@
 Twin experiment for identification bias due to discretisation, with KNOWN TRUTH.
 Synthetic data: EXACT particle model + 'true' parameters (= CALCE 25 C hybrid fit) + real DST 80% current profile + 2 mV noise.
 Fit with hybrid N=10, FV N=20, FV N=10 (two starting points each). Report parameter ratios vs truth.
+With TWIN_KINDS=twocell, fits the two-cell surface extrapolation (PyBaMM default) with N=20 and N=10 instead
+and writes twin_bias_twocell.json.
 """
 import os; ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repository root
 import numpy as np, json, sys, time
@@ -24,7 +26,8 @@ dv = M.load_test('25C_FUDS_80'); Vval = M.simulate(xt, dv, 'exact')[dv['gi']]
 
 starts = [xt + np.array([0.3, -0.3, 0.3, -0.3, 0.2, 0.3, 0.3, 0.02, 0.01]),
           xt + np.array([-0.3, 0.3, -0.3, 0.3, -0.2, -0.3, -0.3, -0.02, -0.01])]
-for kind, N in [('hybrid', 10), ('fv', 20), ('fv', 10), ('fv', 5)]:
+KINDS = [('twocell', 20), ('twocell', 10)] if os.environ.get('TWIN_KINDS') == 'twocell' else [('hybrid', 10), ('fv', 20), ('fv', 10), ('fv', 5)]
+for kind, N in KINDS:
     best = None
     for s0 in starts:
         res = lambda x: (M.simulate(x, d, kind, N)[d['gi']] - Vmeas)[m]
@@ -39,5 +42,5 @@ for kind, N in [('hybrid', 10), ('fv', 20), ('fv', 10), ('fv', 5)]:
     OUT['fits'][lab] = dict(p=p, rmse_fit_mV=rms, rmse_FUDS_vs_truth_mV=val, ratio=ratio)
     print(f"{lab:10s}: fit {rms:5.2f} mV (noise 2.00)  FUDS prediction vs truth {val:5.2f} mV | ratio vs true: "
           + '  '.join(f'{k} {v:.2f}' for k, v in ratio.items()) + f'  ({time.time()-t0:.0f} s)', flush=True)
-json.dump(OUT, open(ROOT + '/calce/twin_bias.json', 'w'))
+json.dump(OUT, open(ROOT + ('/calce/twin_bias_twocell.json' if os.environ.get('TWIN_KINDS') == 'twocell' else '/calce/twin_bias.json'), 'w'))
 print('done')

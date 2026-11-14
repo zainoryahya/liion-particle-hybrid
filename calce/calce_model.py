@@ -74,10 +74,30 @@ def Un(th): return _interp_lin(th, SN, UNt)
 
 
 _CF = {}
+def S_twocell(N, tau):
+    """Uniform FV with the surface value extrapolated linearly from the last two cells, y = (3 c_N - c_{N-1})/2
+    (PyBaMM's default for the particle surface value; also Zeng et al. 2013). No feedthrough."""
+    if N not in _TC:
+        sys.path.insert(0, ROOT + '/battery')
+        from spm import SPM
+        from scipy.linalg import eigh
+        m = SPM(N=N); Mv = np.diag(m.vol); Sm = Mv @ m.K; Sm = 0.5 * (Sm + Sm.T)
+        lam, V = eigh(Sm, Mv); beta = V.T @ Mv @ m.bsurf
+        w = beta * (1.5 * V[-1, :] - 0.5 * V[-2, :]); nz = np.abs(lam) > 1e-12
+        _TC[N] = (lam[nz], w[nz], w[~nz].sum())
+    lam, w, w0 = _TC[N]
+    return tau * w0 + (np.expm1(np.outer(tau, lam)) / lam) @ w
+
+
+_TC = {}
+
+
 def kernel(kind, N, lags):
     """surface step response (unit flux) at dimensionless lags."""
     if kind == 'exact':
         S = HT.S_exact(lags); S[0] = 0.0; return S
+    if kind == 'twocell':
+        return S_twocell(N, lags)
     S = HT.S_fv(N, lags)
     if kind == 'hybrid':
         if N not in _CF:

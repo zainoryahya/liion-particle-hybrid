@@ -4,7 +4,7 @@ Comparison with transfer-function methods (reviewers will certainly ask):
   (ii) exact mode truncation + static correction (equivalent to residue grouping, Smith et al. 2008, in the limit)
   (iii) FV with the two-cell extrapolation of Zeng et al. 2013:  c_s = (3 c_N - c_{N-1}) / 2
   (iv) half-cell FV (ours) and hybrid
-Metric: SHARP l_inf gain (Theorem 1) at dtau = 2.8e-4 (graphite, 1 s), horizon 1800 samples, vs number of states.
+Metric: SHARP l_inf gain (Theorem 1) at dtau = 2.8e-4 (graphite, 1 s) over five diffusion times (horizon.py), vs number of states.
 """
 import os; ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repository root
 import numpy as np, json, sys, io, contextlib, mpmath as mp
@@ -17,8 +17,9 @@ sys.path.insert(0, ROOT + '/battery')
 from spm import SPM
 
 mp.mp.dps = 60
-dtau = 2.8e-4; nst = 1800
-lags = np.arange(nst) * dtau
+import horizon as HZ
+dtau = 2.8e-4
+lags = HZ.lags_for(dtau)
 Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
 
 
