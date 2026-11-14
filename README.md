@@ -2,7 +2,7 @@
 
 Code and derived results for the paper
 
-> Z. R. Yahya and S. Mat Zin, *Discretization Error in Particle Diffusion Biases Identified Lithium-Ion Battery Parameters: Analysis and a Hybrid Correction*, submitted to the Journal of The Electrochemical Society (2026).
+> Z. R. Yahya and S. Mat Zin, *Discretization error in particle diffusion biases identified lithium-ion battery parameters: error analysis and a hybrid correction*, manuscript (2026).
 
 The repository regenerates every figure and table of the paper.
 
@@ -66,20 +66,20 @@ Run the scripts in `ext/` from any folder. Run the scripts in `calce/` and `sams
 
 | Paper item | Script(s) | Output |
 |---|---|---|
-| Exact solution, Prop. 1, Table 1, Fig. 1, Remark 1 (r_N for N = 2–320) | `ext/hybrid_theory2.py`, `ext/rN_check.py`; plot `ext/fig_theory.py` | `ext/out/hybrid_theory.json`, `rN_check.json` |
+| Exact solution, Proposition 1, Table 1, Fig. 1, Appendix A (r_N for N = 2–320), Table B.1 (universal correction at small dtau) | `ext/hybrid_theory2.py`, `ext/rN_check.py`; plot `ext/fig_theory.py` | `ext/out/hybrid_theory.json`, `rN_check.json` |
 | Fig. 2 (step responses, NASA voltage test, plain FV with N = 10–160) | `ext/hybrid.py`, `ext/hybrid_voltage.py`; plot `ext/fig_hybrid.py` | `hybrid.json`, `hybrid_voltage.json` |
-| Comparison of approximations, Fig. 3 | `ext/compare_tf.py`, `ext/compare_tf2.py`, `ext/compare_tf3.py` (Chebyshev, DRA), `ext/graded.py`, `ext/hermite_check.py`; plot `ext/fig_compare_tf_v2.py` | `compare_tf*.json`, `graded.json`, `hermite.json` |
+| Comparison of approximations, Fig. 3 | `ext/compare_tf.py`, `ext/compare_tf2.py`, `ext/compare_tf3.py` (Chebyshev, DRA), `ext/graded.py`, `ext/hermite_check.py`; plot `ext/fig_compare_tf_v2.py`. All gains are taken over five diffusion times (`ext/horizon.py`); `ext/gain_check.py` compares this with using every sample. | `compare_tf*.json`, `graded.json`, `hermite.json`, `gain_check.json` |
 | Cost table (Table 2) and offline set-up times quoted in the text | `ext/cost.py` (about 2 min); per-step timing `ext/bench.c` (`gcc -O2 -o bench ext/bench.c && ./bench`). Timings depend on the machine; the stored files hold the values in the paper. | `cost.json`, `offline_cost.json`, `bench.csv` |
 | ROMs, EKF, SPMe (Fig. 4) | `ext/rom_hybrid.py`, `ext/ekf_hybrid.py`, `ext/spme_hybrid.py`; plot `ext/fig_integration.py` | `rom_hybrid.json`, `ekf_hybrid.json`, `spme_hybrid.json` |
 | Concentration-dependent diffusivity | `DC_DECADES=1 python ext/dc_test.py` and `DC_DECADES=2.5 python ext/dc_test.py` | `dc_test_1.json`, `dc_test_2.5.json` |
 | CALCE data preparation | `python calce/make_raw.py`, `python calce/dyn/load_dyn.py`, then `calce/ocv_balance.py`, `calce/ocv_balance_raw.py`, `calce/hybrid_and_fig.py` | `calce/raw.npz`, `calce/dyn/dyn.npz`, `hybrid_ocp.json` |
 | CALCE fits (Table 3) | `python calce_fit.py 25C hybrid 10`, `... 25C fv 20`, `... 25C fv 10`; 0 °C: `python calce_fit.py 0C hybrid 10 fit_25C_hybrid10.json fit_25C_hybrid10.json`; 45 °C (discussed in the text): `python calce_fit.py 45C hybrid 10 fit_25C_hybrid10.json fit_25C_hybrid10.json` | `fit_*.json` |
-| CALCE validation, bias, twin, EKF (Tables 3–4, Fig. 5) | `calce_validate.py`, `calce_bias.py`, `calce_twin.py`, `calce_ekf.py`; plot `fig_calce_dyn.py` | `validate_25C.json`, `bias_25C.json`, `twin_bias.json`, `ekf_calce_r6.json` |
-| Samsung OCP and 25 °C fits (Table 5, 25 °C column; Fig. 6a,b) | `ocp_ss.py`; `python ss_fit.py UDDS+US06 hybrid 10` (and `fv 10`, `fv 20`); `ss_validate.py`; `ss_twin.py` | `hybrid_ocp_ss.json`, `fit_UDDS+US06_*.json`, `validate_ss.json`, `twin_ss.json` |
+| CALCE validation, bias, twin, EKF (Tables 3–4, Fig. 5) | `calce_validate.py`, `calce_bias.py`, `calce_twin.py` (`TWIN_KINDS=twocell` for the two-cell extrapolation, the PyBaMM default), `calce_twin_mc.py` (ten noise realizations, about 45 min), `calce_ekf.py`; plot `fig_calce_dyn.py` | `validate_25C.json`, `bias_25C.json`, `twin_bias.json`, `twin_bias_twocell.json`, `twin_mc.json`, `ekf_calce_r6.json` |
+| Samsung OCP and 25 °C fits (Table D.1, 25 °C column; Fig. 6a,b) | `ocp_ss.py`; `python ss_fit.py UDDS+US06 hybrid 10` (and `fv 10`, `fv 20`); `ss_validate.py`; `ss_twin.py` | `hybrid_ocp_ss.json`, `fit_UDDS+US06_*.json`, `validate_ss.json`, `twin_ss.json` |
 | Π sweep (Fig. 6c, graphical abstract) | `ss_sweep.py`; plots `fig_ss.py`, `jes/make_ga.py` | `sweep_ss.json` |
-| Low temperature (Table 5, 0 °C and −10 °C) | `python ss_fit_T.py 0degC hybrid 10` (also `fv 10`, `fv 20`, and `-10degC`), `python ss_validate_T.py 0degC`, `python ss_twin_T.py 0degC`; plot `fig_ss.py` | `fitT_*.json`, `validateT_*.json`, `twinT_*.json` |
-| Universal correction coefficients (Appendix B) | `ext/hybrid_theory2.py` | `ext/out/hybrid_theory.json` → `universal` |
-| NASA B0005 parameters (Appendix C), used by `ext/common.py` | `nasa/load_nasa.py` (data preparation) | `nasa/refine_1.json`, `nasa/ocp_tables.npy` |
+| Low temperature (Table D.1, 0 °C; Fig. 6c, black-edged markers) | `python ss_fit_T.py 0degC hybrid 10` (also `fv 10`, `fv 20`, and `-10degC`), `python ss_validate_T.py 0degC`, `python ss_twin_T.py 0degC`; plot `fig_ss.py` | `fitT_*.json`, `validateT_*.json`, `twinT_*.json` |
+| Universal correction coefficients (Table B.2) and its fit term (Appendix B) | `ext/hybrid_theory2.py`, `ext/universal_eta.py` | `ext/out/hybrid_theory.json` → `universal`, `ext/out/universal_eta.json` |
+| NASA B0005 parameters (Table C.1), used by `ext/common.py` | `nasa/load_nasa.py` (data preparation) | `nasa/refine_1.json`, `nasa/ocp_tables.npy` |
 
 Notes:
 

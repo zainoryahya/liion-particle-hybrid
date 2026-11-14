@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(ROOT, 'ext')); sys.path.insert(0, os.path.join(R
 with contextlib.redirect_stdout(io.StringIO()):
     import hybrid as H
 import compare_tf3 as T3
+import horizon as HZ
 
 ok_all = True
 
@@ -28,8 +29,8 @@ print('Exact solution')
 check('sum_n a_n sin(lambda_n) = 1/5 (so S(0) = 0)', float(np.sum(H.AN * np.sin(H.LAM))) + 2 / (np.pi ** 2 * 800.5), 0.2, 1e-4)
 check('a_n sin(lambda_n) = 2/lambda_n^2 (n = 1)', float(H.AN[0] * np.sin(H.LAM[0])), 2 / H.LAM[0] ** 2, 1e-8)
 
-print('Theorem 1: sharp worst-case gain of plain FV, N = 10, dtau = 2.8e-4, 1800 samples')
-dtau = 2.8e-4; lags = np.arange(1800) * dtau
+print('Theorem 1: sharp worst-case gain of plain FV, N = 10, dtau = 2.8e-4, over five diffusion times')
+dtau = 2.8e-4; lags = HZ.lags_for(dtau)
 Sx = H.S_exact(lags); Sx[0] = 0.0
 d = Sx - H.S_fv(N, lags)
 G = abs(d[0]) + np.abs(np.diff(d)).sum()
@@ -40,9 +41,9 @@ H.MU = np.logspace(-1, 6.5, 16)
 cf = H.fit_correction(N, tau_min=dtau / 20)
 Sh = H.S_fv(N, lags) + cf['Einf'] + np.exp(-np.outer(lags, H.MU)) @ cf['w']
 dh = Sx - Sh
-check('G_hybrid (Table 1, 2.5e-4)', abs(dh[0]) + np.abs(np.diff(dh)).sum(), 2.5e-4, 0.1)
+check('G_hybrid (Table 1, 2.6e-4)', abs(dh[0]) + np.abs(np.diff(dh)).sum(), 2.57e-4, 0.03)
 
-print('Universal correction (Appendix B)')
+print('Universal correction (Table B.2)')
 U = json.load(open(os.path.join(ROOT, 'ext', 'out', 'hybrid_theory.json')))['universal']
 check('sum of universal weights = 1/2', float(np.sum(U['w'])), 0.5, 1e-10)
 
@@ -50,6 +51,6 @@ print('Comparison baselines (Fig. 3, Table 2)')
 A, b, C, dd, ns = T3.cheb_sys(20)
 check('Chebyshev Nc = 20 (9 states): gain', T3.gain_at(T3.step_lin(A, b, C, dd, lags), dtau), 1.64e-2, 0.02)
 Ad, Bd, Cd, s = T3.dra(6, dtau)
-check('DRA n = 6 (7 states): gain', T3.gain_at(T3.step_dra(Ad, Bd, Cd, lags), dtau), 1.98e-4, 0.05)
+check('DRA n = 6 (7 states): gain', T3.gain_at(T3.step_dra(Ad, Bd, Cd, lags, dtau), dtau), 1.98e-4, 0.05)
 
 print('\nALL CHECKS PASSED' if ok_all else '\nSOME CHECKS FAILED')

@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this code, please cite the paper and this software archive."
 title: "Particle diffusion under battery-management-system currents: error analysis and a hybrid correction (code and data)"
 type: software
-version: 1.0.1
+version: 1.1.0
 date-released: 2026-11-08
 license: MIT
 doi: 10.5281/zenodo.23556199
@@ -25,12 +25,11 @@ keywords:
   - parameter identification
 preferred-citation:
   type: article
-  title: "Discretization Error in Particle Diffusion Biases Identified Lithium-Ion Battery Parameters: Analysis and a Hybrid Correction"
+  title: "Discretization error in particle diffusion biases identified lithium-ion battery parameters: error analysis and a hybrid correction"
   authors:
     - family-names: Yahya
       given-names: Zainor Ridzuan
     - family-names: Mat Zin
       given-names: Shazalina
-  journal: "Journal of The Electrochemical Society"
   year: 2026
-  notes: "Submitted"
+  notes: "Manuscript"
