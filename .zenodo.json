@@ -1,7 +1,7 @@
 {
-  "title": "Particle diffusion under battery-management-system currents: error analysis and a hybrid correction (code and data)",
+  "title": "Particle-mesh discretization and identified lithium-ion battery parameters (code and data)",
   "upload_type": "software",
-  "description": "Code and derived results for the paper 'Discretization Error in Particle Diffusion Biases Identified Lithium-Ion Battery Parameters: Analysis and a Hybrid Correction' (Z. R. Yahya and S. Mat Zin, manuscript in preparation for journal submission). Regenerates the figures and tables from the stored results; Fig. 6a and the parameter fits need the public raw battery data, which are not redistributed (see data/README.md).",
+  "description": "Code and derived results for the paper 'Particle-mesh discretization biases lithium-ion battery parameters identified from drive cycles: when it matters and how to correct it' (Z. R. Yahya and S. Mat Zin, manuscript submitted to the Journal of Energy Storage). Regenerates the figures and tables from the stored results; Fig. 6a and the parameter fits need the public raw battery data, which are not redistributed (see data/README.md).",
   "creators": [
     {
       "name": "Yahya, Zainor Ridzuan",
@@ -23,5 +23,5 @@
     "parameter identification"
   ],
   "access_right": "open",
-  "version": "1.1.0"
+  "version": "1.1.1"
 }

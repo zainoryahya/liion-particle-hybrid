@@ -25,7 +25,11 @@ for s1 in [1e-9,1e-6,1e-4,1e-3,1,10]:
     OUT['eta'].append(dict(sigma1=s1, new=float(eta(NUn,wn,s1)), old20=float(eta(NUo,wo,s1))))
     print('sigma1 %.0e  eta new %.2e  old %.2e'%(s1, eta(NUn,wn,s1), eta(NUo,wo,s1)))
 dt=2.8e-7; LH=HZ.lags_for(dt); Sx=S_exact(LH); Sx[0]=0
-G=[HZ.gain(Sx-S_fv(N,LH)-(1/N)*(np.exp(-np.outer(LH*N*N,NUo))@wo)) for N in [5,10,20,40,80,160]]
+FAR=np.geomspace(HZ.T_TAIL,1e9,3000)[1:]          # far tail: FV and exact parts constant, correction still decaying
+def G20(N):
+    E=Sx-S_fv(N,LH); gh=lambda s: np.exp(-np.outer(s,NUo))@wo
+    return HZ.gain_with_tail(E-(1/N)*gh(LH*N*N), E[-1]-(1/N)*gh(FAR*N*N))
+G=[G20(N) for N in [5,10,20,40,80,160]]
 print('old 20-rate gains at 2.8e-7', ['%.2e'%x for x in G], 'orders', ['%.2f'%(np.log(G[i]/G[i+1])/np.log(2)) for i in range(5)])
 OUT['old20_gains_2.8e-7']=[float(x) for x in G]
 json.dump(OUT, open(ROOT+'/ext/out/universal_eta.json','w'), indent=1)

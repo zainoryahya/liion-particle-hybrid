@@ -12,7 +12,7 @@ sys.path.insert(0, ROOT + '/ext'); import horizon as HZ
 def step_resp_C(K, b, V, C, D, lags):
     Mv = np.diag(V); S = Mv @ K; S = 0.5 * (S + S.T)
     lam, U = eigh(S, Mv); beta = U.T @ Mv @ b; w = beta * (C @ U)
-    nz = np.abs(lam) > 1e-12
+    nz = np.abs(lam) > 1e-9 * np.abs(lam).max()
     return D + lags * w[~nz].sum() + (np.expm1(np.outer(lags, lam[nz])) / lam[nz]) @ w[nz]
 
 OUT = {}

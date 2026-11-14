@@ -7,8 +7,9 @@ Prop 1 (a) E_N(0+) = h/2 ;  (b) E_N(inf) = h^2/3 - h^4/30 (closed form) ;
 Theorem 2 (error representation & sharp bound): for piecewise-constant q, e_k = sum_j dq_j delta((k-j)dtau) and
        sup_{|q|<=1} |e_k| = |delta(0)| + sum_{m=1}^k |delta(m dtau) - delta((m-1) dtau)|   (an equality, not merely a bound).
 Theorem 3 (universal correction): Ehat_N(tau) = h ghat(tau/h^2) with ghat(0) = 1/2 -> uniform O(h^2) error, K states independent of N.
-Gains reported in Table 1 ('gain_inf') are taken over five diffusion times (horizon.py); 'gain' is the gain over the
-1800-step random profile used for the error-bound check.
+Gains reported in Table 1 ('gain_inf') are the limits k -> infinity: samples to tau = 2000 (horizon.py) and, for the
+universal correction, a closed-form far tail (univ_gain); 'gain_tau5' is the gain over tau <= 5 only (the value reported
+up to v1.1.0) and 'gain' the gain over the 1800-step random profile used for the error-bound check.
 """
 import os; ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # repository root
 import numpy as np, json, sys, math
@@ -53,7 +54,7 @@ def fv_modal(N):
 def phi(lam, tau):
     lt = np.outer(tau, lam)
     with np.errstate(divide='ignore', invalid='ignore'):
-        r = np.where(np.abs(lam) < 1e-12, tau[:, None], np.expm1(lt) / np.where(np.abs(lam) < 1e-12, 1, lam))
+        r = np.where(np.abs(lam) < 1e-9 * np.abs(lam).max(), tau[:, None], np.expm1(lt) / np.where(np.abs(lam) < 1e-9 * np.abs(lam).max(), 1, lam))
     return r
 
 
@@ -119,6 +120,16 @@ ghat = lambda s: np.exp(-np.outer(np.atleast_1d(s), NU)) @ wU
 print(f'ghat: sum w = {wU.sum():.12f};  max |g - ghat| for sigma<=1e5 = {np.abs(ghat(sf_) - gf).max():.2e}')
 OUT['universal'] = dict(nu=NU.tolist(), w=wU.tolist())
 
+# The universal correction has rates down to 1e-6/h^2, so its error keeps varying long after the FV and exact parts have
+# settled (tau > 5). Its gain (the limit k -> infinity) is completed with a far tail on which E_N is constant.
+FAR = np.geomspace(HZ.T_TAIL, 1e9, 3000)[1:]
+
+
+def univ_gain(N, LH, EH, w=None, nu=None):
+    h = 1 / N
+    gh = ghat if w is None else (lambda s: np.exp(-np.outer(np.atleast_1d(s), nu)) @ w)
+    return HZ.gain_with_tail(EH - h * gh(LH / h ** 2), EH[-1] - h * gh(FAR / h ** 2))
+
 
 # ---------- Theorems 2 & 3 on the random profile (hybrid.json): sharp worst-case gain vs observed error
 Hd = json.load(open(ROOT + '/ext/out/hybrid.json'))
@@ -151,13 +162,16 @@ for N in Ns:
     rec = dict(N=N)
     LH = HZ.lags_for(dtau); SxH = S_exact(LH); SxH[0] = 0.0; EH = SxH - S_fv(N, LH)
     EhatH = {'FV': 0 * EH, 'hybrid_fitN': cf['Einf'] + np.exp(-np.outer(LH, H.MU)) @ cf['w'], 'hybrid_universal': h * ghat(LH / h ** 2)}
+    LH5 = LH <= HZ.T_H
     for lab, Ehat in [('FV', 0 * E), ('hybrid_fitN', Ehat_N), ('hybrid_universal', Ehat_U)]:
         d = E - Ehat
         y = duhamel(Sh + Ehat, q)
         err = np.abs(y - ref).max()
         G = gain(d)
+        dH = EH - EhatH[lab]
+        G_lim = univ_gain(N, LH, EH) if lab == 'hybrid_universal' else gain(dH)
         rec[lab] = dict(max_err=float(err), gain=float(G), bound=float(G * qmax), ok=bool(err <= G * qmax * (1 + 1e-9)),
-                        gain_inf=float(gain(EH - EhatH[lab])))
+                        gain_tau5=float(gain(dH[LH5])), gain_inf=float(G_lim))
     t2.append(rec)
     print(f"N={N:3d}: FV error {rec['FV']['max_err']:.2e} <= gain*|q| {rec['FV']['bound']:.2e} [{rec['FV']['ok']}] | "
           f"hybrid(fit-N) {rec['hybrid_fitN']['max_err']:.2e} <= {rec['hybrid_fitN']['bound']:.2e} [{rec['hybrid_fitN']['ok']}] | "
@@ -201,7 +215,7 @@ json.dump(OUT, open(ROOT + '/ext/out/hybrid_theory.json', 'w'))
 for lab in ['FV', 'hybrid_fitN', 'hybrid_universal']:
     v = [r[lab]['gain_inf'] for r in t2]
     OUT[f'order_{lab}_gain_inf'] = -np.polyfit(np.log(Ns), np.log(v), 1)[0]
-    print(f"gain over 5 diffusion times, {lab:17s}: " + ' '.join(f'{x:.2e}' for x in v) + f"  order {OUT[f'order_{lab}_gain_inf']:.2f}")
+    print(f"gain (limit),               {lab:17s}: " + ' '.join(f'{x:.2e}' for x in v) + f"  order {OUT[f'order_{lab}_gain_inf']:.2f}")
 
 # ---------- universal correction at small sampling intervals (local orders between successive N)
 NS2 = [5, 10, 20, 40, 80, 160]
@@ -211,7 +225,7 @@ for dt in [2.8e-4, 2.8e-6, 2.8e-7]:
     G = []
     for N in NS2:
         h = 1 / N
-        G.append(gain(SxH - S_fv(N, LH) - h * ghat(LH / h ** 2)))
+        G.append(univ_gain(N, LH, SxH - S_fv(N, LH)))
     orders = [float(np.log(G[i] / G[i + 1]) / np.log(2)) for i in range(len(G) - 1)]
     small[str(dt)] = dict(N=NS2, gain=[float(x) for x in G], local_order=orders)
     print(f'universal, dtau={dt:.1e}: gains ' + ' '.join(f'{x:.2e}' for x in G) + '  local orders ' + ' '.join(f'{o:.2f}' for o in orders), flush=True)

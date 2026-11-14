@@ -29,7 +29,7 @@ def fv_graded(faces):
 def step_resp(K, b, V, D, lags):
     Mv = np.diag(V); S = Mv @ K; S = 0.5 * (S + S.T)
     lam, U = eigh(S, Mv); beta = U.T @ Mv @ b; w = beta * U[-1, :]
-    nz = np.abs(lam) > 1e-12
+    nz = np.abs(lam) > 1e-9 * np.abs(lam).max()
     return D + lags * w[~nz].sum() + (np.expm1(np.outer(lags, lam[nz])) / lam[nz]) @ w[nz]
 
 

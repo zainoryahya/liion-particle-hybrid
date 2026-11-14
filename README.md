@@ -1,8 +1,8 @@
-# Particle diffusion under battery-management-system currents: error analysis and a hybrid correction
+# Particle-mesh discretization and identified lithium-ion battery parameters: code and data
 
 Code and derived results for the paper
 
-> Z. R. Yahya and S. Mat Zin, *Discretization error in particle diffusion biases identified lithium-ion battery parameters: error analysis and a hybrid correction*, manuscript (2026).
+> Z. R. Yahya and S. Mat Zin, *Particle-mesh discretization biases lithium-ion battery parameters identified from drive cycles: when it matters and how to correct it*, manuscript submitted to the Journal of Energy Storage (2026).
 
 The repository regenerates every figure and table of the paper.
 
@@ -13,12 +13,12 @@ The repository regenerates every figure and table of the paper.
 
 | Folder | Contents |
 |---|---|
-| `ext/` | Theory and numerics. Exact solution, finite-volume (FV) step error (Proposition 1), sharp worst-case gain (Theorem 1), hybrid correction (per-mesh and universal, Theorem 2), comparison with graded meshes, Hermite and two-cell extrapolation, Chebyshev collocation, Padé, DRA and BT-SPA. Also: cost table, reduced-order models, EKF, SPMe, and the concentration-dependent diffusivity test. Results are in `ext/out/`. |
+| `ext/` | Theory and numerics. Exact solution, finite-volume (FV) step error (Proposition 1, Remark 1), sharp worst-case gain (Lemma 1), hybrid correction (per-mesh and universal, Theorem 1), comparison with graded meshes, Hermite and two-cell extrapolation, Chebyshev collocation, Padé, DRA and BT-SPA. Also: cost table, reduced-order models, EKF, SPMe, the concentration-dependent diffusivity test, the check against PyBaMM (`pybamm_check.py`) and the single-precision check (`float32_check.py`). Results are in `ext/out/`. |
 | `battery/` | Single particle model (FV) used by `ext/`. |
 | `nasa/` | Open-circuit potential tables and the identified parameter vector of the NASA B0005 particle model (derived data, inputs to `ext/common.py`). |
 | `calce/` | CALCE INR18650-20R: data conversion, OCV balancing, fits with three particle solvers, validation, twin experiment, bias, EKF on measured data. |
 | `samsung/` | McMaster Samsung INR21700-30T: OCP, fits, validation, twin experiments, Π sweep, Arrhenius model with exact warped-time modal recursion (C library in `samsung/csrc/`). |
-| `jes/` | Scripts that produce the journal figures (`figure1`–`figure6`, 300 dpi TIFF/PDF/PNG) and the graphical abstract. |
+| `jes/` | Scripts that produce the paper figures (`figure1`–`figure6`, 300 dpi TIFF/PDF/PNG) and the graphical abstract. (The folder name dates from the first version of the code.) |
 | `figures/` | Output folder for figures. |
 | `data/` | Place for the downloaded raw data (not redistributed). |
 
@@ -55,7 +55,7 @@ It ends with `ALL CHECKS PASSED`.
 ```bash
 python jes/make_figs_jes.py figure1 figure2 figure3 figure4 figure5   # need only the stored results
 python jes/make_figs_jes.py figure6                                   # panel (a) also needs the raw Samsung data (see data/README.md)
-python jes/make_ga.py                                         # graphical abstract (needs the stored Samsung sweep)
+python jes/make_ga.py                                         # graphical abstract (needs the stored twin-experiment results)
 ```
 
 The figures are written to `figures/jes/`.
@@ -66,12 +66,14 @@ Run the scripts in `ext/` from any folder. Run the scripts in `calce/` and `sams
 
 | Paper item | Script(s) | Output |
 |---|---|---|
-| Exact solution, Proposition 1, Table 1, Fig. 1, Appendix A (r_N for N = 2–320), Table B.1 (universal correction at small dtau) | `ext/hybrid_theory2.py`, `ext/rN_check.py`; plot `ext/fig_theory.py` | `ext/out/hybrid_theory.json`, `rN_check.json` |
+| Exact solution, Proposition 1, Remark 1, Table 1, Fig. 1, Appendix A (r_N for N = 2–320), Table B.1 (universal correction at small dtau) | `ext/hybrid_theory2.py`, `ext/rN_check.py`; plot `ext/fig_theory.py` | `ext/out/hybrid_theory.json`, `rN_check.json` |
 | Fig. 2 (step responses, NASA voltage test, plain FV with N = 10–160) | `ext/hybrid.py`, `ext/hybrid_voltage.py`; plot `ext/fig_hybrid.py` | `hybrid.json`, `hybrid_voltage.json` |
-| Comparison of approximations, Fig. 3 | `ext/compare_tf.py`, `ext/compare_tf2.py`, `ext/compare_tf3.py` (Chebyshev, DRA), `ext/graded.py`, `ext/hermite_check.py`; plot `ext/fig_compare_tf_v2.py`. All gains are taken over five diffusion times (`ext/horizon.py`); `ext/gain_check.py` compares this with using every sample. | `compare_tf*.json`, `graded.json`, `hermite.json`, `gain_check.json` |
+| Comparison of approximations, Fig. 3 | `ext/compare_tf.py`, `ext/compare_tf2.py`, `ext/compare_tf3.py` (Chebyshev, DRA), `ext/graded.py`, `ext/hermite_check.py`; plot `ext/fig_compare_tf_v2.py`. Gains are the limits over the whole horizon: samples to tau = 2000 (`ext/horizon.py`) and, for the universal correction, a closed-form far tail (`ext/hybrid_theory2.py`); `ext/gain_check.py` compares the sampled horizon with using every sample and with a doubled tail. | `compare_tf*.json`, `graded.json`, `hermite.json`, `gain_check.json` |
 | Cost table (Table 2) and offline set-up times quoted in the text | `ext/cost.py` (about 2 min); per-step timing `ext/bench.c` (`gcc -O2 -o bench ext/bench.c && ./bench`). Timings depend on the machine; the stored files hold the values in the paper. | `cost.json`, `offline_cost.json`, `bench.csv` |
 | ROMs, EKF, SPMe (Fig. 4) | `ext/rom_hybrid.py`, `ext/ekf_hybrid.py`, `ext/spme_hybrid.py`; plot `ext/fig_integration.py` | `rom_hybrid.json`, `ekf_hybrid.json`, `spme_hybrid.json` |
-| Concentration-dependent diffusivity | `DC_DECADES=1 python ext/dc_test.py` and `DC_DECADES=2.5 python ext/dc_test.py` | `dc_test_1.json`, `dc_test_2.5.json` |
+| Concentration-dependent diffusivity (Appendix E) | `DC_DECADES=1 python ext/dc_test.py` and `DC_DECADES=2.5 python ext/dc_test.py` | `dc_test_1.json`, `dc_test_2.5.json` |
+| Agreement with PyBaMM's particle surface value (Section 2.2) | `python ext/pybamm_check.py` (needs `pip install pybamm`; tested with 26.10.1) | `pybamm_check.json` |
+| Single-precision implementation (Section 2.4) | `python ext/float32_check.py` | `float32_check.json` |
 | CALCE data preparation | `python calce/make_raw.py`, `python calce/dyn/load_dyn.py`, then `calce/ocv_balance.py`, `calce/ocv_balance_raw.py`, `calce/hybrid_and_fig.py` | `calce/raw.npz`, `calce/dyn/dyn.npz`, `hybrid_ocp.json` |
 | CALCE fits (Table 3) | `python calce_fit.py 25C hybrid 10`, `... 25C fv 20`, `... 25C fv 10`; 0 °C: `python calce_fit.py 0C hybrid 10 fit_25C_hybrid10.json fit_25C_hybrid10.json`; 45 °C (discussed in the text): `python calce_fit.py 45C hybrid 10 fit_25C_hybrid10.json fit_25C_hybrid10.json` | `fit_*.json` |
 | CALCE validation, bias, twin, EKF (Tables 3–4, Fig. 5) | `calce_validate.py`, `calce_bias.py`, `calce_twin.py` (`TWIN_KINDS=twocell` for the two-cell extrapolation, the PyBaMM default), `calce_twin_mc.py` (ten noise realizations, about 45 min), `calce_ekf.py`; plot `fig_calce_dyn.py` | `validate_25C.json`, `bias_25C.json`, `twin_bias.json`, `twin_bias_twocell.json`, `twin_mc.json`, `ekf_calce_r6.json` |
@@ -93,7 +95,7 @@ The raw data are public but are not redistributed here. Download links and the e
 
 ## How to cite
 
-Please cite the paper above and this archive: doi:[10.5281/zenodo.23556199](https://doi.org/10.5281/zenodo.23556199) (see `CITATION.cff`).
+Please cite the paper above and this archive (see `CITATION.cff`). doi:[10.5281/zenodo.23556199](https://doi.org/10.5281/zenodo.23556199) is the first version (v1.0.0); every later release has its own version DOI on the same Zenodo record page (v1.1.0: 10.5281/zenodo.24211519).
 
 ## Changes
 

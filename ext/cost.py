@@ -50,7 +50,7 @@ def zeng_S(N, lags):
     Mv = np.diag(V); S = Mv @ K; S = 0.5 * (S + S.T)
     lam, U = eigh(S, Mv); beta = U.T @ Mv @ b
     cvec = 1.5 * U[-1, :] - 0.5 * U[-2, :]
-    w = beta * cvec; nz = np.abs(lam) > 1e-12
+    w = beta * cvec; nz = np.abs(lam) > 1e-9 * np.abs(lam).max()
     return lags * w[~nz].sum() + (np.expm1(np.outer(lags, lam[nz])) / lam[nz]) @ w[nz], float(np.max(np.abs(lam)))
 
 

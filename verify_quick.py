@@ -1,13 +1,17 @@
 """Quick check (about 10 seconds, no battery data needed): recomputes key numbers of the paper from scratch and compares
 them with the values printed in the paper.  Run:  python verify_quick.py"""
 import os, sys, io, contextlib, json
-import numpy as np
+import numpy as np, warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 ROOT = os.environ.get('LIION_ROOT', os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'ext')); sys.path.insert(0, os.path.join(ROOT, 'battery'))
 with contextlib.redirect_stdout(io.StringIO()):
     import hybrid as H
 import compare_tf3 as T3
 import horizon as HZ
+sys.path.insert(0, os.path.join(ROOT, 'calce'))
+with contextlib.redirect_stdout(io.StringIO()):
+    import calce_model as CM          # modal step responses (accurate over long horizons)
 
 ok_all = True
 
@@ -29,19 +33,19 @@ print('Exact solution')
 check('sum_n a_n sin(lambda_n) = 1/5 (so S(0) = 0)', float(np.sum(H.AN * np.sin(H.LAM))) + 2 / (np.pi ** 2 * 800.5), 0.2, 1e-4)
 check('a_n sin(lambda_n) = 2/lambda_n^2 (n = 1)', float(H.AN[0] * np.sin(H.LAM[0])), 2 / H.LAM[0] ** 2, 1e-8)
 
-print('Theorem 1: sharp worst-case gain of plain FV, N = 10, dtau = 2.8e-4, over five diffusion times')
+print('Lemma 1: sharp worst-case gain of plain FV, N = 10, dtau = 2.8e-4 (sampled horizon of ext/horizon.py)')
 dtau = 2.8e-4; lags = HZ.lags_for(dtau)
-Sx = H.S_exact(lags); Sx[0] = 0.0
-d = Sx - H.S_fv(N, lags)
+Sx = CM.HT.S_exact(lags); Sx[0] = 0.0
+d = Sx - CM.HT.S_fv(N, lags)
 G = abs(d[0]) + np.abs(np.diff(d)).sum()
-check('G_FV (Table 1)', G, 9.683178e-2, 1e-5)
+check('G_FV (Table 1, 9.6832e-2)', G, 9.6832e-2, 1e-5)
 
 print('Per-mesh hybrid correction, N = 10, K = 16')
 H.MU = np.logspace(-1, 6.5, 16)
-cf = H.fit_correction(N, tau_min=dtau / 20)
-Sh = H.S_fv(N, lags) + cf['Einf'] + np.exp(-np.outer(lags, H.MU)) @ cf['w']
+cf = H.fit_correction(N)                     # tau_min = 1e-6, as in the theory tests
+Sh = CM.HT.S_fv(N, lags) + cf['Einf'] + np.exp(-np.outer(lags, H.MU)) @ cf['w']
 dh = Sx - Sh
-check('G_hybrid (Table 1, 2.6e-4)', abs(dh[0]) + np.abs(np.diff(dh)).sum(), 2.57e-4, 0.03)
+check('G_hybrid (Table 1, 2.6e-4; limit incl. slow correction states)', abs(dh[0]) + np.abs(np.diff(dh)).sum(), 2.591e-4, 0.005)
 
 print('Universal correction (Table B.2)')
 U = json.load(open(os.path.join(ROOT, 'ext', 'out', 'hybrid_theory.json')))['universal']

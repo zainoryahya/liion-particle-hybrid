@@ -1,0 +1,32 @@
+{
+ "N": 10,
+ "dtau": 0.00028,
+ "n_samples": 100000,
+ "u0": 0.5,
+ "runs": {
+  "FV": {
+   "states": 10,
+   "dense_max_abs_diff": 0.00012654078153273574,
+   "dense_first_1800": 8.376437981294504e-07,
+   "diagonal_max_abs_diff": 1.937562093834444e-05,
+   "diagonal_first_1800": 1.7507525598148277e-06,
+   "max_fp64_vs_reference_y_check": 2.7267077484793845e-13
+  },
+  "per-mesh": {
+   "states": 26,
+   "dense_max_abs_diff": 0.0003863893701782084,
+   "dense_first_1800": 4.445349308324076e-06,
+   "diagonal_max_abs_diff": 1.9391347518382673e-05,
+   "diagonal_first_1800": 1.7303293340376058e-06,
+   "max_fp64_vs_reference_y_check": 3.904088163864117e-11
+  },
+  "universal": {
+   "states": 50,
+   "dense_max_abs_diff": 0.00038645686788874034,
+   "dense_first_1800": 4.449529697220234e-06,
+   "diagonal_max_abs_diff": 1.9405232713598508e-05,
+   "diagonal_first_1800": 1.727777613091952e-06,
+   "max_fp64_vs_reference_y_check": 1.8673807111735385e-08
+  }
+ }
+}

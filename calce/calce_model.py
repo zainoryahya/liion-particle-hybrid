@@ -49,7 +49,7 @@ class HT:          # copy of functions from ext/hybrid_theory2.py (avoids runnin
             HT._fv[N] = (lam, beta * V[-1, :], -0.5 * m.dr)
         lam, wgt, D = HT._fv[N]
         tau = np.atleast_1d(tau).astype(float)
-        nz = np.abs(lam) > 1e-12
+        nz = np.abs(lam) > 1e-9 * np.abs(lam).max()
         out = np.full(len(tau), D) + (tau * wgt[~nz].sum())
         out += (np.expm1(np.outer(tau, lam[nz])) / lam[nz]) @ wgt[nz]
         return out
@@ -83,7 +83,7 @@ def S_twocell(N, tau):
         from scipy.linalg import eigh
         m = SPM(N=N); Mv = np.diag(m.vol); Sm = Mv @ m.K; Sm = 0.5 * (Sm + Sm.T)
         lam, V = eigh(Sm, Mv); beta = V.T @ Mv @ m.bsurf
-        w = beta * (1.5 * V[-1, :] - 0.5 * V[-2, :]); nz = np.abs(lam) > 1e-12
+        w = beta * (1.5 * V[-1, :] - 0.5 * V[-2, :]); nz = np.abs(lam) > 1e-9 * np.abs(lam).max()
         _TC[N] = (lam[nz], w[nz], w[~nz].sum())
     lam, w, w0 = _TC[N]
     return tau * w0 + (np.expm1(np.outer(tau, lam)) / lam) @ w

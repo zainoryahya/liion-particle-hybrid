@@ -33,12 +33,15 @@ for lab, col, m, name in [('fv10', C[1], 'o', 'FV N=10'), ('fv20', C[3], 's', 'F
     if (~ok).any():
         ax[2].semilogx(Pi[~ok], y[~ok], 'x', color=col, ms=7, mew=1.5)
 ax[2].plot([], [], 'x', color=INK2, label='fit failed (residual > 50 mV; noise 2 mV)')
-ax[2].plot([2.11], [0.28], 'o', color=C[1], ms=8, mfc='white', mew=1.5); ax[2].plot([2.11], [0.67], 's', color=C[3], ms=8, mfc='white', mew=1.5)
-ax[2].annotate('CALCE 18650 twin\n(open markers)', (2.11, 0.28), xytext=(0.12, 0.27), fontsize=7, color=INK2, arrowprops=dict(arrowstyle='->', color=INK2, lw=0.6))
+# CALCE twin experiment (Table 4): means over ten noise realizations; Pi_n = 2.11 (peak current 4 A)
+MC = json.load(open(ROOT + '/calce/twin_mc.json'))['summary']
+r10, r20 = MC['fv N=10']['tau_n']['mean'], MC['fv N=20']['tau_n']['mean']
+ax[2].plot([2.11], [r10], 'o', color=C[1], ms=10, mfc='white', mew=1.5); ax[2].plot([2.11], [r20], 's', color=C[3], ms=11, mfc='white', mew=1.5)
+ax[2].annotate('CALCE 18650 twin\n(open markers)', (2.11, r10), xytext=(0.12, 0.27), fontsize=7, color=INK2, arrowprops=dict(arrowstyle='->', color=INK2, lw=0.6))
 ax[2].axvline(0.40, color=INK2, lw=0.6, ls=':'); ax[2].text(0.42, 1.08, 'Samsung 30T, 25 °C', fontsize=7, color=INK2)
 TW = json.load(open('twinT_0degC.json')); P0 = TW['Pi_Tmean']
 for lab, col, m in [('fv N=10', C[1], 'o'), ('fv N=20', C[3], 's'), ('hybrid N=10', C[0], 'D')]:
-    ax[2].plot([P0], [TW['fits'][lab]['ratio']['tau_n']], m, color=col, ms=8, mec=INK, mew=1.4)
+    ax[2].plot([P0], [TW['fits'][lab]['ratio']['tau_n']], m, color=col, ms=6, mec=INK, mew=1.2)
 ax[2].annotate('Samsung 30T at 0 °C\n(twin, measured cell T;\nblack-edged markers)', (P0, TW['fits']['fv N=10']['ratio']['tau_n']),
                xytext=(0.12, 0.47), fontsize=7, color=INK2, arrowprops=dict(arrowstyle='->', color=INK2, lw=0.6))
 ax[2].axhline(1, color=INK2, lw=0.5)

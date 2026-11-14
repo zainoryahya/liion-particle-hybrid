@@ -3,25 +3,25 @@
   "FV, uniform": {
    "config": "N=1000",
    "states": 1000,
-   "gain": 0.0009996884489369418,
+   "gain": 0.0009997247462691927,
    "stiff": 4121377.25304885
   },
   "FV, optimally graded": {
    "config": "N=50",
    "states": 50,
-   "gain": 0.0007301745530790132,
-   "stiff": 63483581.45688477
+   "gain": 0.0007301853577114659,
+   "stiff": 64176087.178685166
   },
   "FV, two-cell extrapolation": {
    "config": "N=200",
    "states": 200,
-   "gain": 0.0006019343264549448,
+   "gain": 0.0006019349721197997,
    "stiff": 164855.09012195145
   },
   "Chebyshev collocation": {
    "config": "Nc=80",
    "states": 39,
-   "gain": 0.000938087105381772,
+   "gain": 0.0009380899568407853,
    "stiff": 582186.9621080861
   },
   "Pade approximant": {
@@ -33,19 +33,19 @@
   "DRA (realized at this interval)": {
    "config": "n=5",
    "states": 6,
-   "gain": 0.0009341840594706136,
+   "gain": 0.000934184060284185,
    "stiff": 9610.132409953543
   },
   "hybrid (FV + correction)": {
    "config": "N=5,K=16",
    "states": 21,
-   "gain": 0.0008569984010114579,
+   "gain": 0.0008933300802676652,
    "stiff": 3162277.660168379
   },
   "BT-SPA of hybrid": {
    "config": "r=7",
    "states": 8,
-   "gain": 0.0006618361194127196,
+   "gain": 0.0006618361203328724,
    "stiff": 4992673.026136524
   }
  },
@@ -53,25 +53,25 @@
   "FV, uniform": {
    "config": "N=1000",
    "states": 1000,
-   "gain": 0.0009996884485043989,
+   "gain": 0.0009997247462789627,
    "stiff": 4121377.25304885
   },
   "FV, optimally graded": {
    "config": "N=50",
    "states": 50,
-   "gain": 0.0007571469112195462,
-   "stiff": 57595965.01433339
+   "gain": 0.00075715516035961,
+   "stiff": 57409488.74437818
   },
   "FV, two-cell extrapolation": {
    "config": "N=300",
    "states": 300,
-   "gain": 0.0008447210440570337,
+   "gain": 0.0008447280005608494,
    "stiff": 370923.95277439564
   },
   "Chebyshev collocation": {
    "config": "Nc=80",
    "states": 39,
-   "gain": 0.0009395299007306047,
+   "gain": 0.0009395327531071376,
    "stiff": 582186.9621080861
   },
   "Pade approximant": {
@@ -84,19 +84,19 @@
   "DRA (realized at this interval)": {
    "config": "n=8",
    "states": 9,
-   "gain": 0.0008879009386637722,
+   "gain": 0.0008879009395004363,
    "stiff": 115965.53768332959
   },
   "hybrid (FV + correction)": {
    "config": "N=5,K=16",
    "states": 21,
-   "gain": 0.0008867202804990187,
+   "gain": 0.0009230417791077899,
    "stiff": 3162277.660168379
   },
   "BT-SPA of hybrid": {
    "config": "r=7",
    "states": 8,
-   "gain": 0.0009500558124538503,
+   "gain": 0.0009500558133740031,
    "stiff": 4992673.026136524
   }
  }

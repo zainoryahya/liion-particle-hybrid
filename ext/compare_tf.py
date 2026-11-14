@@ -47,7 +47,7 @@ def S_zeng(N, tau):
     m = SPM(N=N); Mv = np.diag(m.vol); S = Mv @ m.K; S = 0.5 * (S + S.T)
     lam, V = eigh(S, Mv); beta = V.T @ Mv @ m.bsurf
     cvec = 1.5 * V[-1, :] - 0.5 * V[-2, :]
-    wgt = beta * cvec; nz = np.abs(lam) > 1e-12
+    wgt = beta * cvec; nz = np.abs(lam) > 1e-9 * np.abs(lam).max()
     return tau * wgt[~nz].sum() + (np.expm1(np.outer(tau, lam[nz])) / lam[nz]) @ wgt[nz]
 OUT['FV, two-cell extrapolation (Zeng 2013)'] = [(N, float(gain(S_zeng(N, lags)))) for N in [5, 10, 20, 40, 80, 160]]
 
